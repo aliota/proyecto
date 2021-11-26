@@ -46,11 +46,22 @@ import com.ae.proyecto.impl.UnionImpl.UnionT;
  */
 public class Main {
 
-    private final static int POPULATION_SIZE = 50;
-    private final static int NUM_ITERATIONS = 10000; //50*100;
+    private final static int POPULATION_SIZE = 50;//100;
+    private final static int NUM_ITERATIONS = 1000;//100000; 
     private final static Integer LARGO_CHAPA = 244; 
     private final static Integer ANCHO_CHAPA = 120; 
-
+    private final static double PROBABILIDAD_MUTACION = 0.001; // 0,1 / 0,01 / 0,001
+    private final static double PROBABILIDAD_CRUZAMIENTO = 1.0; // 1 / 0,8 / 0,5
+    
+    private int pedido;
+    private int calibre;
+    private static int iteraciones = NUM_ITERATIONS;
+    private static int poblacion = POPULATION_SIZE;
+    private static double mutacion = PROBABILIDAD_MUTACION;
+    private static double cruzamiento = PROBABILIDAD_CRUZAMIENTO;
+    
+    
+    
     private static List<com.ae.proyecto.figuras.Figura> readInstanciaFile(String path) {
         List<com.ae.proyecto.figuras.Figura> cortes = new ArrayList<>();
 
@@ -203,15 +214,15 @@ public class Main {
                 
 
         CrossoverOperator<IntegerSolution> crossover =
-                new IntegerSBXCrossover(1.0,20.0);
+                new IntegerSBXCrossover(cruzamiento,20.0); // ACA
         MutationOperator<IntegerSolution> mutation =
-                new IntegerPolynomialMutation(1.0 / problem.getNumberOfVariables(), 20.0) ;
+                new IntegerPolynomialMutation(mutacion, 20.0) ;// ACA 1.0 / problem.getNumberOfVariables()
         SelectionOperator<List<IntegerSolution>, IntegerSolution> selection = new BinaryTournamentSelection<IntegerSolution>() ;
 
         SolutionListEvaluator<IntegerSolution> evaluator = new MultithreadedSolutionListEvaluator<IntegerSolution>(6);
         algorithm = new GeneticAlgorithmBuilder<IntegerSolution>(problem, crossover, mutation)
-                .setPopulationSize(POPULATION_SIZE)
-                .setMaxEvaluations(NUM_ITERATIONS)
+                .setPopulationSize(poblacion)     //
+                .setMaxEvaluations(iteraciones)   //
                 .setSelectionOperator(selection)
                 .setSolutionListEvaluator(evaluator)
                 .build() ;
@@ -237,7 +248,16 @@ public class Main {
         out.println("Fitness: " + solution.getObjective(0)) ;
        
         JMetalLogger.logger.info("Solucion fue escrita a: solution.out");
-        	
+        JMetalLogger.logger.info("Total execution time: " + computingTime/1000 + "s");
+        JMetalLogger.logger.info("Cobertura Total: " + problem.getCoberturaTotal());
+        JMetalLogger.logger.info("Cobertura Actual: " + problem.getCoberturaActual());
+        JMetalLogger.logger.info("Cantidad de chapas usadas: " + problem.getCantidadChapas());
+        JMetalLogger.logger.info("Fitness: " + solution.getObjective(0)) ;
+        JMetalLogger.logger.info("Iteraciones: " + iteraciones) ;
+        JMetalLogger.logger.info("Población: " + poblacion) ;
+        JMetalLogger.logger.info("Probabilidad de Mutación: " + mutacion) ;
+        JMetalLogger.logger.info("Probabilidad de Cruzamiento: " + cruzamiento) ;
+        
      }catch (FileNotFoundException e) {
             System.err.println("Error alescribir archivo 'solution.out'");
         }
@@ -404,8 +424,21 @@ public class Main {
             System.exit(1);
         } else {
         	System.out.println(" * argumentos: " + args.length);
-        	String path="instancias/0355.in"; //cambiar path por args[0]
-        	// String path = args[0];
+        	String path="instancias/0355.in"; // = args[0];
+        	String numIteraciones = "1000"; // = args[1];
+        	String numPoblacion = "30"; //= args[2];
+        	String probMutacion = "0.0001"; //= args[3];
+        	String probCruzamiento = "1.0"; //= args[4];
+        	
+        	iteraciones = Integer.parseInt(numIteraciones); 
+        	poblacion = Integer.parseInt(numPoblacion); //= args[2];
+        	mutacion = Double.parseDouble(probMutacion); //= args[3];
+        	cruzamiento = Double.parseDouble(probCruzamiento); //= args[4];
+        	
+        	
+        	
+        	
+        	
         	System.out.println(" * file: " + path);
             if (Files.isDirectory(Paths.get(path))) {  
                 // read all files and process them
